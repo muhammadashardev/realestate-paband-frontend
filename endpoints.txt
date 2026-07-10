@@ -1,0 +1,411 @@
+========================================================================
+                      PABAND REAL ESTATE - API ENDPOINTS
+========================================================================
+
+Base URL: http://localhost:5000 (Or backend URL in production)
+
+------------------------------------------------------------------------
+1. AUTHENTICATION MODULE (Public & Private)
+------------------------------------------------------------------------
+
+### A. Register User
+- **Method:** POST
+- **Endpoint:** /api/auth/register
+- **Access:** Public
+- **Headers:** Content-Type: application/json
+- **Request Body (JSON):**
+  ```json
+  {
+    "fullName": "John Doe",
+    "email": "johndoe@example.com",
+    "phoneNumber": "+923001234567",
+    "address": "123 Street, Karachi, Pakistan",
+    "password": "Password123",
+    "confirmPassword": "Password123",
+    "role": "tenant", // OR "owner" (case insensitive)
+    "incomeSource": "Job" // Required ONLY if role is "tenant" (Choose: "Job" or "Business")
+  }
+  ```
+- **Response (201 Created):**
+  ```json
+  {
+    "message": "Registration successful! A 6-digit verification OTP has been sent to your email address.",
+    "email": "johndoe@example.com"
+  }
+  ```
+
+### B. Verify OTP
+- **Method:** POST
+- **Endpoint:** /api/auth/verify-otp
+- **Access:** Public
+- **Headers:** Content-Type: application/json
+- **Request Body (JSON):**
+  ```json
+  {
+    "email": "johndoe@example.com",
+    "otp": "123456"
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "message": "Email verified successfully!",
+    "accessToken": "eyJhbGciOi...",
+    "refreshToken": "eyJhbGciOi...",
+    "user": {
+      "id": "60d0fe...",
+      "fullName": "John Doe",
+      "email": "johndoe@example.com",
+      "phoneNumber": "+923001234567",
+      "role": "tenant",
+      "isEmailVerified": true,
+      "isVerified": false,
+      "accountStatus": "pending",
+      "incomeSource": "Job"
+    }
+  }
+  ```
+
+### C. Resend OTP
+- **Method:** POST
+- **Endpoint:** /api/auth/resend-otp
+- **Access:** Public
+- **Headers:** Content-Type: application/json
+- **Request Body (JSON):**
+  ```json
+  {
+    "email": "johndoe@example.com"
+  }
+  ```
+- **Note:** Rate limiting allows max 3 resends every 15 minutes.
+- **Response (200 OK):**
+  ```json
+  {
+    "message": "A new 6-digit OTP code has been sent to your email address."
+  }
+  ```
+
+### D. Login User
+- **Method:** POST
+- **Endpoint:** /api/auth/login
+- **Access:** Public
+- **Headers:** Content-Type: application/json
+- **Request Body (JSON):**
+  ```json
+  {
+    "email": "johndoe@example.com",
+    "password": "Password123"
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "accessToken": "eyJhbGciOi...",
+    "refreshToken": "eyJhbGciOi...",
+    "user": {
+      "id": "60d0fe...",
+      "fullName": "John Doe",
+      "email": "johndoe@example.com",
+      "phoneNumber": "+923001234567",
+      "role": "tenant",
+      "isEmailVerified": true,
+      "isVerified": false,
+      "accountStatus": "pending",
+      "incomeSource": "Job"
+    }
+  }
+  ```
+
+### E. Logout User
+- **Method:** POST
+- **Endpoint:** /api/auth/logout
+- **Access:** Public (Requires valid Refresh Token in body)
+- **Headers:** Content-Type: application/json
+- **Request Body (JSON):**
+  ```json
+  {
+    "refreshToken": "eyJhbGciOi..."
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "message": "Logged out successfully."
+  }
+  ```
+
+
+------------------------------------------------------------------------
+2. TENANT VERIFICATION MODULE (Protected - Tenant Only)
+------------------------------------------------------------------------
+
+### A. Upload Verification Documents (Multipart Form-Data)
+- **Method:** POST
+- **Endpoint:** /api/tenant/upload-documents
+- **Access:** Private (Protected: Bearer Token required + Role must be 'tenant')
+- **Headers:** 
+  - Authorization: Bearer <accessToken>
+  - Content-Type: multipart/form-data
+- **Request Body (form-data fields):**
+  This API dynamic base inputs require files depending on the user's registered `incomeSource` ("Job" or "Business").
+  
+  **Case 1: If User's incomeSource is "Job"**
+  - **Required Documents:**
+    1. `policeCertificate` (File, Max: 1, Min: 1) -> Police verification certificate.
+    2. `bankStatement` (File, Max: 1, Min: 1) -> Recent bank statement.
+    3. `appointmentLetter` (File, Max: 1, Min: 1) -> Official job appointment letter.
+    4. `salarySlip` (File, Max: 1, Min: 1) -> Recent salary slip.
+  - **Optional Documents:**
+    5. `additionalDocuments` (Files array, Max: 10, Min: 0) -> Additional supporting files.
+
+  **Case 2: If User's incomeSource is "Business"**
+  - **Required Documents:**
+    1. `ntnCertificate` (File, Max: 1, Min: 1) -> National Tax Number Certificate.
+    2. `businessLetterhead` (File, Max: 1, Min: 1) -> Business Letterhead image or document.
+  - **Optional Documents:**
+    3. `additionalDocuments` (Files array, Max: 10, Min: 0) -> Additional supporting files.
+
+- **Response (201 Created):**
+  ```json
+  {
+    "message": "Documents uploaded successfully! Your verification is now pending review by an admin."
+  }
+  ```
+
+### B. Check Verification Status
+- **Method:** GET
+- **Endpoint:** /api/tenant/verification-status
+- **Access:** Private (Protected: Bearer Token required + Role must be 'tenant')
+- **Headers:** Authorization: Bearer <accessToken>
+- **Response (200 OK):**
+  ```json
+  {
+    "fullName": "John Doe",
+    "email": "johndoe@example.com",
+    "incomeSource": "Job",
+    "isVerified": false,
+    "accountStatus": "pending",
+    "verificationDetails": {
+      "id": "60d0fe...",
+      "verificationStatus": "pending", // "pending", "approved", "rejected"
+      "rejectionReason": "", // Filled if rejected
+      "policeCertificate": "https://cloudinary...",
+      "bankStatement": "https://cloudinary...",
+      "appointmentLetter": "https://cloudinary...",
+      "salarySlip": "https://cloudinary...",
+      "additionalDocuments": ["https://cloudinary..."]
+    }
+  }
+  ```
+
+
+------------------------------------------------------------------------
+3. PROPERTIES MODULE (Public & Owner Protected)
+------------------------------------------------------------------------
+
+### A. Get All Properties (Filterable)
+- **Method:** GET
+- **Endpoint:** /api/properties
+- **Access:** Public
+- **Query Parameters (Optional):**
+  - `featured`: true/false
+  - `propertyType`: House/Apartment/Commercial etc.
+  - `status`: For Rent / Rented
+  - `location`: "Karachi" (partial matches)
+  - `search`: Searches in title, description, location
+  - `beds`: Number of bedrooms (minimum)
+  - `baths`: Number of bathrooms (minimum)
+  - `minPrice`: Minimum price limit
+  - `maxPrice`: Maximum price limit
+- **Response (200 OK):**
+  ```json
+  [
+    {
+      "_id": "60d0fe...",
+      "propertyId": "OP-734",
+      "title": "Beautiful Luxury Apartment",
+      "location": "Clifton, Karachi",
+      "price": "Rs. 75,000",
+      "beds": 2,
+      "baths": 2,
+      "sqft": "1200",
+      "image": "https://cloudinary...",
+      "gallery": ["https://cloudinary..."],
+      "status": "For Rent",
+      "featured": true,
+      "owner": "60d0fe..."
+    }
+  ]
+  ```
+
+### B. Get Single Property
+- **Method:** GET
+- **Endpoint:** /api/properties/:id
+- **Access:** Public
+- **Parameters:** `:id` can be either the MongoDB ObjectId (e.g. `60d0fe...`) or the custom `propertyId` (e.g. `OP-734`).
+- **Response (200 OK):** Detailed property JSON object.
+
+### C. Create Property (Multipart Form-Data / JSON)
+- **Method:** POST
+- **Endpoint:** /api/properties
+- **Access:** Private (Protected: Bearer Token required + Role must be 'owner')
+- **Headers:** 
+  - Authorization: Bearer <accessToken>
+  - Content-Type: multipart/form-data
+- **Request Body (form-data fields):**
+  - **Required Text Fields:**
+    - `title`: String
+    - `location`: String
+    - `price`: String (e.g., "Rs. 75,000" or "75000")
+  - **Optional Text Fields:**
+    - `propertyId`: String (e.g. "OP-734"). If not provided, a random ID will be generated.
+    - `beds`: Number (default: 0)
+    - `baths`: Number (default: 0)
+    - `sqft`: String (default: "0")
+    - `garages`: Number (default: 0)
+    - `rooms`: Number (default: 0)
+    - `description`: String
+    - `lotArea`: String
+    - `homeArea`: String
+    - `status`: String (default: "For Rent")
+    - `yearBuilt`: Number (default: current year)
+    - `featured`: String ("true" or "false", default: "false")
+    - `propertyType`: String (default: "House")
+    - `amenities`: Array or JSON string of array (e.g., `["Gym", "Pool", "Security"]` or as comma-separated string: `"Gym, Pool, Security"`)
+  - **Image Upload Fields:**
+    1. `image` (File, Max: 1, Min: 0) -> Main/Cover image of the property.
+    2. `gallery` (Files array, Max: 10, Min: 0) -> Gallery/Additional images of the property.
+
+- **Response (201 Created):** Created property JSON details.
+
+### D. Update Property (Multipart Form-Data / JSON)
+- **Method:** PUT
+- **Endpoint:** /api/properties/:id
+- **Access:** Private (Protected: Bearer Token required + Owner of property or Admin)
+- **Headers:** 
+  - Authorization: Bearer <accessToken>
+  - Content-Type: multipart/form-data or application/json
+- **Parameters:** `:id` can be either the MongoDB ObjectId or custom `propertyId`.
+- **Request Body (form-data fields):**
+  - Any of the text fields mentioned in "Create Property".
+  - **Image Upload Fields (Optional replacement/addition):**
+    1. `image` (File, Max: 1) -> Overwrites current main image if uploaded.
+    2. `gallery` (Files array, Max: 10) -> Uploads new images to add to the existing gallery.
+- **Response (200 OK):** Updated property JSON details.
+
+### E. Delete Property
+- **Method:** DELETE
+- **Endpoint:** /api/properties/:id
+- **Access:** Private (Protected: Bearer Token required + Owner of property or Admin)
+- **Headers:** Authorization: Bearer <accessToken>
+- **Response (200 OK):**
+  ```json
+  {
+    "message": "Property deleted successfully"
+  }
+  ```
+
+
+------------------------------------------------------------------------
+4. INQUIRIES MODULE (Public & Admin Protected)
+------------------------------------------------------------------------
+
+### A. Submit Inquiry (Contact/Booking)
+- **Method:** POST
+- **Endpoint:** /api/inquiries
+- **Access:** Public
+- **Headers:** Content-Type: application/json
+- **Request Body (JSON):**
+  ```json
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "johndoe@example.com",
+    "phone": "+923001234567",
+    "message": "I am interested in renting this apartment. Please contact me.",
+    "propertyId": "OP-734" // Optional: Associated Property Custom ID
+  }
+  ```
+- **Response (201 Created):**
+  ```json
+  {
+    "message": "Inquiry submitted successfully",
+    "inquiry": {
+      "_id": "60d0fe...",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "johndoe@example.com",
+      "phone": "+923001234567",
+      "message": "I am interested in renting this apartment...",
+      "propertyId": "OP-734"
+    }
+  }
+  ```
+
+### B. Get All Inquiries
+- **Method:** GET
+- **Endpoint:** /api/inquiries
+- **Access:** Private (Protected: Bearer Token required + Admin role only)
+- **Headers:** Authorization: Bearer <accessToken>
+- **Response (200 OK):** List of all submitted inquiries with joined property details.
+
+
+------------------------------------------------------------------------
+5. ADMIN MANAGEMENT MODULE (Protected - Admin Only)
+------------------------------------------------------------------------
+
+### A. Get All Users
+- **Method:** GET
+- **Endpoint:** /api/admin/users
+- **Access:** Private (Protected: Bearer Token required + Admin role only)
+- **Query Parameters (Optional):**
+  - `role`: Filter users by role ('tenant' or 'owner' or 'admin')
+  - `search`: Search in user fullName, email, or phoneNumber
+- **Response (200 OK):** List of users.
+
+### B. Get Tenant Documents
+- **Method:** GET
+- **Endpoint:** /api/admin/tenant/:id
+- **Access:** Private (Protected: Bearer Token required + Admin role only)
+- **Parameters:** `:id` is the MongoDB ObjectId of the tenant.
+- **Response (200 OK):** Tenant verification records (Job or Business documents).
+
+### C. Approve Tenant Verification
+- **Method:** PATCH
+- **Endpoint:** /api/admin/tenant/approve/:id
+- **Access:** Private (Protected: Bearer Token required + Admin role only)
+- **Response (200 OK):**
+  ```json
+  {
+    "message": "Tenant John Doe has been successfully verified and approved."
+  }
+  ```
+
+### D. Reject Tenant Verification
+- **Method:** PATCH
+- **Endpoint:** /api/admin/tenant/reject/:id
+- **Access:** Private (Protected: Bearer Token required + Admin role only)
+- **Request Body (JSON):**
+  ```json
+  {
+    "rejectionReason": "Bank statement is blurred and not clear."
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "message": "Tenant John Doe documents have been rejected. Notification email sent."
+  }
+  ```
+
+### E. Suspend Property Owner Account
+- **Method:** PATCH
+- **Endpoint:** /api/admin/owner/suspend/:id
+- **Access:** Private (Protected: Bearer Token required + Admin role only)
+- **Response (200 OK):** Suspends owner and updates accountStatus to 'suspended'.
+
+### F. Activate Property Owner Account
+- **Method:** PATCH
+- **Endpoint:** /api/admin/owner/activate/:id
+- **Access:** Private (Protected: Bearer Token required + Admin role only)
+- **Response (200 OK):** Un-suspends owner and updates accountStatus to 'approved'.

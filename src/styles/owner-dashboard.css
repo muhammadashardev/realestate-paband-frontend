@@ -1,0 +1,252 @@
+/* =============================================
+   PABAND - Property Owner Dashboard Styles
+   ============================================= */
+
+/* Custom Scrollbar for Sidebar */
+.owner-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.owner-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.owner-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(200, 151, 63, 0.3);
+  border-radius: 2px;
+}
+
+.owner-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(200, 151, 63, 0.6);
+}
+
+/* Hide vertical scrollbar inside the sidebar nav (remove the visible Y-axis line) */
+.owner-sidebar nav {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.owner-sidebar nav::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Main content scrollbar */
+.owner-main::-webkit-scrollbar {
+  width: 6px;
+}
+
+.owner-main::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.owner-main::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+/* Stat Card Mini Sparkline */
+.sparkline-green {
+  stroke: #16A34A;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sparkline-red {
+  stroke: #EF4444;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Income Chart */
+.chart-line-last {
+  stroke: #EC4899;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-line-this {
+  stroke: #8B5CF6;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Quick Action Card Hover */
+.quick-action-card {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Status Badge animations */
+.status-badge {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Owner Sidebar Nav Item */
+.owner-nav-item {
+  transition: all 0.2s ease;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.owner-nav-item:hover {
+  background: rgba(200, 151, 63, 0.15);
+}
+
+.owner-nav-item.active {
+  background: #C8973F;
+}
+
+/* Table Row Hover */
+.property-row {
+  transition: background 0.15s ease;
+}
+
+.property-row:hover {
+  background: #f9fafb;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #E5E7EB;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked+.toggle-slider {
+  background-color: #C8973F;
+}
+
+.toggle-switch input:checked+.toggle-slider:before {
+  transform: translateX(20px);
+}
+
+/* File Upload Area */
+.file-upload-area {
+  transition: all 0.2s ease;
+}
+
+.file-upload-area:hover {
+  border-color: #C8973F;
+  background: rgba(200, 151, 63, 0.02);
+}
+
+/* Notification dot pulse */
+.notif-dot {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Chart axis labels */
+.chart-label {
+  font-size: 11px;
+  fill: #9CA3AF;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Responsive sidebar overlay */
+@media (max-width: 768px) {
+  .owner-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+  }
+}
+
+/* Property image thumbnail hover */
+.img-thumb {
+  transition: transform 0.2s ease;
+}
+
+.img-thumb:hover {
+  transform: scale(1.05);
+}
+
+/* Pagination button */
+.page-btn {
+  transition: all 0.2s ease;
+}
+
+.page-btn:hover:not(.active):not(:disabled) {
+  background: #F3F4F6;
+}
+
+.page-btn.active {
+  background: #1A1A2E;
+  color: white;
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

@@ -1,0 +1,192 @@
+/* =============================================
+   PABAND - Tenant Dashboard Styles
+   ============================================= */
+
+/* Custom Scrollbar for Tenant Sidebar */
+.tenant-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.tenant-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tenant-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(182, 139, 57, 0.3);
+  border-radius: 2px;
+}
+.tenant-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(182, 139, 57, 0.6);
+}
+
+/* Main content scrollbar */
+.tenant-main::-webkit-scrollbar {
+  width: 6px;
+}
+.tenant-main::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+.tenant-main::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+/* Status Cards */
+.tenant-status-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tenant-status-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* Visit Cards */
+.tenant-visit-card {
+  transition: all 0.25s ease;
+}
+.tenant-visit-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(10, 34, 64, 0.15);
+}
+
+/* Quick Action Items */
+.tenant-quick-action {
+  transition: all 0.2s ease;
+}
+.tenant-quick-action:hover {
+  background: #F9FAFB;
+  transform: translateX(4px);
+}
+
+/* Timeline Line Connector */
+.tenant-timeline-item {
+  position: relative;
+}
+.tenant-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 40px;
+  bottom: -16px;
+  width: 2px;
+  background: #E5E7EB;
+}
+.tenant-timeline-item:last-child::before {
+  display: none;
+}
+
+/* Property Card Hover */
+.tenant-property-card {
+  transition: all 0.3s ease;
+}
+.tenant-property-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Heart Icon */
+.tenant-heart-btn {
+  transition: all 0.2s ease;
+}
+.tenant-heart-btn:hover {
+  transform: scale(1.15);
+}
+
+/* Modal Animations */
+.tenant-modal-backdrop {
+  animation: tenantFadeIn 0.3s ease;
+}
+.tenant-modal-content {
+  animation: tenantSlideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes tenantFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tenantSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Success Modal Pulse */
+.tenant-success-pulse {
+  animation: tenantSuccessPulse 2s infinite;
+}
+@keyframes tenantSuccessPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(182, 139, 57, 0.4); }
+  50% { box-shadow: 0 0 0 15px rgba(182, 139, 57, 0); }
+}
+
+/* Image Gallery Thumbnail */
+.tenant-thumb {
+  transition: all 0.2s ease;
+}
+.tenant-thumb:hover {
+  transform: scale(1.05);
+  border-color: #B68B39 !important;
+}
+
+/* Filter dropdown */
+.tenant-filter-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Notification dot pulse (for tenant) */
+.tenant-notif-dot {
+  animation: tenantPulse 2s infinite;
+}
+@keyframes tenantPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Responsive sidebar overlay */
+@media (max-width: 768px) {
+  .tenant-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+  }
+}
+
+/* Property Status Radio Button Style */
+.tenant-status-radio {
+  transition: all 0.2s ease;
+}
+.tenant-status-radio.active {
+  background: #B68B39;
+  color: white;
+  border-color: #B68B39;
+}
+
+/* Verified badge shimmer */
+.tenant-verified-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.tenant-verified-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: tenantShimmer 3s infinite;
+}
+@keyframes tenantShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
